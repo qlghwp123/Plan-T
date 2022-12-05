@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os, json
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +20,37 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+
+# ---- 배포했을 때에도 키,시크릿키 먹게끔 하는 함수 -------
+def get_env(setting, envs):
+    try:
+        return envs[setting]
+    except KeyError:
+        error_msg = "You SHOULD set {} environ".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+
+DEV_ENVS = os.path.join(BASE_DIR, "envs_dev.json")
+DEPLOY_ENVS = os.path.join(BASE_DIR, "envs.json")
+
+if os.path.exists(DEV_ENVS):  # Develop Env
+    env_file = open(DEV_ENVS)
+elif os.path.exists(DEPLOY_ENVS):  # Deploy Env
+    env_file = open(DEPLOY_ENVS)
+else:
+    env_file = None
+
+if env_file is None:  # System environ
+    try:
+        GOOGLE_KEY = os.environ["GOOGLE_KEY"]
+        GOOGLE_SECRET = os.environ["GOOGLE_SECRET"]
+    except KeyError as error_msg:
+        raise ImproperlyConfigured(error_msg)
+else:  # JSON env
+    envs = json.loads(env_file.read())
+    GOOGLE_KEY = get_env("GOOGLE_KEY", envs)
+    GOOGLE_SECRET = get_env("GOOGLE_SECRET", envs)
+# -------------------------------------------------
 
 # Secret Key
 secret_file = os.path.join(BASE_DIR, "secret.json")
@@ -72,11 +102,21 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ------------- social login 관련 -------------------
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.google.GoogleOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 )
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_KEY
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = GOOGLE_SECRET
+
+LOGIN_URL = "/"
+LOGIN_REDIRECT_URL = "todos:today"
+SOCIAL_AUTH_URL_NAMESPACE = "social"
+
 ROOT_URLCONF = "pjt.urls"
+# ---------------------------------------------------
 
 TEMPLATES = [
     {
@@ -107,12 +147,6 @@ DATABASES = {
     }
 }
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("key")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("secret")
-
-LOGIN_URL = "/"
-LOGIN_REDIRECT_URL = "todos:today"
-SOCIAL_AUTH_URL_NAMESPACE = "social"
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 

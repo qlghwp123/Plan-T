@@ -1,6 +1,5 @@
-
 from django import forms
-from .models import Study
+from .models import Study, StudyTodo
 
 
 class StudyForm(forms.ModelForm):
@@ -11,6 +10,8 @@ class StudyForm(forms.ModelForm):
             "title",
             "max_people",
             "desc",
+        ]
+
 
 class StudyTodoForm(forms.ModelForm):
     class Meta:
