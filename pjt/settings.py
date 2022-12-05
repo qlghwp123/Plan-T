@@ -15,6 +15,8 @@ import os, json
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -108,8 +110,8 @@ DATABASES = {
 }
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = key
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("key")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("secret")
 
 LOGIN_URL = "/"
 LOGIN_REDIRECT_URL = "todos:today"
