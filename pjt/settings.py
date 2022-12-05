@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os, json
 from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,10 +108,8 @@ DATABASES = {
 }
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = (
-    "946672796991-t0et8e64hpea9rrp43sshis89dhkjarn.apps.googleusercontent.com"
-)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = secret
 
 LOGIN_URL = "/"
 LOGIN_REDIRECT_URL = "todos:today"
